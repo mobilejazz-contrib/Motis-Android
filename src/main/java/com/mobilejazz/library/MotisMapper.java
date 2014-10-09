@@ -87,7 +87,7 @@ public class MotisMapper {
         return true;
     }
 
-    private void mapObjectForKey(Object object, String jsonKey, Object jsonValue)  {
+    public void mapObjectForKey(Object object, String jsonKey, Object jsonValue)  {
 
         Class objectClass = object.getClass();
 
@@ -235,8 +235,7 @@ public class MotisMapper {
         }
     }
 
-    private Method getMotisMethod(String keyword, String name, Class<?> ... paramClass)
-    {
+    private Method getMotisMethod(String keyword, String name, Class<?> ... paramClass) {
         String uppercaseName = "";
 
         if (name != null && name.length() > 0)
@@ -255,7 +254,6 @@ public class MotisMapper {
 
         return null;
     }
-
 
     private void createInstance(Object object, String creationMethodName, MotisValidation motisValidation, Class outClass) {
 
