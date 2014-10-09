@@ -141,16 +141,21 @@ public class MotisMapper {
             if (validated) {
                 // If validated, set the new value
                 boolean accessible = field.isAccessible();
-                field.setAccessible(true);
+
+                field.setAccessible(true); // Why setter the accessible to true when is false;
+
+
                 try {
                     field.set(object, finalValue);
                 } catch (IllegalAccessException e) {
                     // TODO: could not set value!
+                    System.out.println("IllegalArgumentException: " + e.getMessage());
                 }
 
                 field.setAccessible(accessible);
             } else {
                 // TODO: value not validated!
+                System.out.println("No es valido");
             }
         } catch (NoSuchFieldException e) {
             // TODO : handle exception
@@ -228,9 +233,29 @@ public class MotisMapper {
                 motisValidationObject.setValid(false);
             }
 
-        } else if (false) {
+        } else if (inClass.equals(String.class)) {
             // TODO: Do other cases as Dates, URLS, etc.
-        } else {
+            String valueString = (String) motisValidationObject.getObject();
+            if (outClass.equals(int.class)) {
+
+                valueString.trim();
+
+                int value = (int) Integer.valueOf(valueString);
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+            } else if (outClass.equals(Integer.class)) {
+                Integer value = Integer.valueOf((String) motisValidationObject.getObject());
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+            }
+
+        }
+
+        /**
+         * json types: dictionary, array, string, number, true/false, null
+         */
+
+        else {
             // Otherwise the values are not compatible. However, we keep the valid status and we let the IllegalArgumentException to be raised.
         }
     }

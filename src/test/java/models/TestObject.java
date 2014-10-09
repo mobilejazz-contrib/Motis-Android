@@ -16,8 +16,8 @@ public class TestObject {
     @MotisKey("double") private double doubleField;
     @MotisKey("boolean") private boolean booleanField;
 
-    @MotisKey("string")private String stringField;
-    @MotisKey("date")private Date dateField;
+    @MotisKey("string") private String stringField;
+    @MotisKey("date") private Date dateField;
 
     public int getIntField() {
         return intField;
