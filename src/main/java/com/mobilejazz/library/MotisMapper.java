@@ -238,39 +238,49 @@ public class MotisMapper {
             String valueString = (String) motisValidationObject.getObject();
             if (outClass.equals(int.class)) {
 
-                int value = (int) Integer.valueOf(valueString.trim());
+                int value = (int) Integer.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
             } else if (outClass.equals(Integer.class)) {
 
-                Integer value = Integer.valueOf(valueString.trim());
+                Integer value = Integer.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
             } else if (outClass.equals(float.class)) {
 
-                float value = (float) Float.valueOf(valueString.trim());
+                float value = (float) Float.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
             } else if (outClass.equals(Float.class)) {
 
-                Float value = Float.valueOf(valueString.trim());
+                Float value = Float.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
             } else if (outClass.equals(double.class)) {
 
-                double value = (double) Double.valueOf(valueString.trim());
+                double value = (double) Double.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
             } else if (outClass.equals(Double.class)) {
 
-                Double value = Double.valueOf(valueString.trim());
+                Double value = Double.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
+
+            } else if (outClass.equals(long.class)) {
+
+                long value = (long) Long.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Long.class)) {
+
+                Long value = Long.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
 
             }
 
@@ -350,4 +360,10 @@ public class MotisMapper {
         motisValidation.setObject(newInstance);
         motisValidation.setValid(valid);
     }
+
+    private void setMotisValidationObject (MotisValidation motisValidation, Object value, boolean isValid) {
+        motisValidation.setObject(value);
+        motisValidation.setValid(isValid);
+    }
+
 }

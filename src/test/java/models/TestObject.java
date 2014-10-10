@@ -15,6 +15,7 @@ public class TestObject {
     @MotisKey("float") private float floatField;
     @MotisKey("double") private double doubleField;
     @MotisKey("boolean") private boolean booleanField;
+    @MotisKey("long") private long longField;
 
     @MotisKey("string") private String stringField;
     @MotisKey("date") private Date dateField;
@@ -22,6 +23,7 @@ public class TestObject {
     @MotisKey("Float") private Float floatClassField;
     @MotisKey("Integer") private Integer integerClassField;
     @MotisKey("Double") private Double doubleClassField;
+    @MotisKey("Long") private Long longClassField;
 
     public int getIntField() {
         return intField;
@@ -93,5 +95,21 @@ public class TestObject {
 
     public void setDoubleClassField(Double doubleClassField) {
         this.doubleClassField = doubleClassField;
+    }
+
+    public long getLongField() {
+        return longField;
+    }
+
+    public void setLongField(long longField) {
+        this.longField = longField;
+    }
+
+    public Long getLongClassField() {
+        return longClassField;
+    }
+
+    public void setLongClassField(Long longClassField) {
+        this.longClassField = longClassField;
     }
 }

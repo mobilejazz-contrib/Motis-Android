@@ -15,11 +15,13 @@ public class BaseTestCase extends TestCase {
     private static final String KEY_INT = "int";
     private static final String KEY_FLOAT = "float";
     private static final String KEY_DOUBLE = "double";
+    private static final String KEY_LONG = "long";
     private static final String KEY_STRING = "string";
     private static final String KEY_DATE = "date";
     private static final String KEY_FLOAT_CLASS = "Float";
     private static final String KEY_INTEGER_CLASS = "Integer";
     private static final String KEY_DOUBLE_CLASS = "Double";
+    private static final String KEY_LONG_CLASS = "Long";
 
     @Override
     protected void setUp() throws Exception {
@@ -158,11 +160,31 @@ public class BaseTestCase extends TestCase {
                 .isNotNull()
                 .isEqualTo(-1.0);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE_CLASS, "-1.0 ");
+        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE_CLASS, "-1. 0 ");
 
         assertThat(motisObject.getDoubleClassField())
                 .isNotNull()
                 .isEqualTo(-1.0);
+
+    }
+
+    public void testStringToLong () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        // Check with primitive type
+        motisMapper.mapObjectForKey(motisObject, KEY_LONG, "-9223372036854775808");
+
+        assertThat(motisObject.getLongField())
+                .isNotNull()
+                .isEqualTo(Long.MIN_VALUE);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_LONG_CLASS, "92233720 36854775807");
+
+        assertThat(motisObject.getLongClassField())
+                .isNotNull()
+                .isEqualTo(Long.MAX_VALUE);
 
     }
 
