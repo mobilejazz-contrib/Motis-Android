@@ -21,6 +21,7 @@ public class TestObject {
 
     @MotisKey("Float") private Float floatClassField;
     @MotisKey("Integer") private Integer integerClassField;
+    @MotisKey("Double") private Double doubleClassField;
 
     public int getIntField() {
         return intField;
@@ -84,5 +85,13 @@ public class TestObject {
 
     public void setIntegerClassField(Integer integerClassField) {
         this.integerClassField = integerClassField;
+    }
+
+    public Double getDoubleClassField() {
+        return doubleClassField;
+    }
+
+    public void setDoubleClassField(Double doubleClassField) {
+        this.doubleClassField = doubleClassField;
     }
 }

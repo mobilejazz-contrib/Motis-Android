@@ -244,7 +244,7 @@ public class MotisMapper {
 
             } else if (outClass.equals(Integer.class)) {
 
-                Integer value = Integer.valueOf((String) motisValidationObject.getObject());
+                Integer value = Integer.valueOf(valueString.trim());
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 
@@ -257,6 +257,18 @@ public class MotisMapper {
             } else if (outClass.equals(Float.class)) {
 
                 Float value = Float.valueOf(valueString.trim());
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+
+            } else if (outClass.equals(double.class)) {
+
+                double value = (double) Double.valueOf(valueString.trim());
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+
+            } else if (outClass.equals(Double.class)) {
+
+                Double value = Double.valueOf(valueString.trim());
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
 

@@ -19,6 +19,7 @@ public class BaseTestCase extends TestCase {
     private static final String KEY_DATE = "date";
     private static final String KEY_FLOAT_CLASS = "Float";
     private static final String KEY_INTEGER_CLASS = "Integer";
+    private static final String KEY_DOUBLE_CLASS = "Double";
 
     @Override
     protected void setUp() throws Exception {
@@ -93,6 +94,19 @@ public class BaseTestCase extends TestCase {
                 .isNotNull();
     }
 
+    public void testFloatToFloat() throws Exception {
+        TestObject motisObject = new TestObject();
+        motisObject.setFloatField(0.0f);
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT, 1.0f);
+
+        assertThat(motisObject.getFloatField())
+                .isNotNull()
+                .isEqualTo(1.0f);
+
+    }
+
     public void testStringToInt () throws Exception {
         TestObject motisObject = new TestObject();
 
@@ -102,6 +116,13 @@ public class BaseTestCase extends TestCase {
         assertThat(motisObject.getIntField())
                 .isNotNull()
                 .isEqualTo(1);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_INTEGER_CLASS, "12323232 ");
+
+        assertThat(motisObject.getIntegerClassField())
+                .isNotNull()
+                .isEqualTo(12323232);
+
     }
 
     public void testStringToFloat () throws Exception {
@@ -123,19 +144,25 @@ public class BaseTestCase extends TestCase {
                 .isNotNull()
                 .isEqualTo(1.0f);
 
-
     }
 
-   public void testFloatToFloat() throws Exception {
+    public void testStringToDouble () throws Exception {
         TestObject motisObject = new TestObject();
-        motisObject.setFloatField(0.0f);
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT, 1.0f);
 
-        assertThat(motisObject.getFloatField())
+        // Check with primitive type
+        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE, "-1.0 ");
+
+        assertThat(motisObject.getDoubleField())
                 .isNotNull()
-                .isEqualTo(1.0f);
+                .isEqualTo(-1.0);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE_CLASS, "-1.0 ");
+
+        assertThat(motisObject.getDoubleClassField())
+                .isNotNull()
+                .isEqualTo(-1.0);
 
     }
 
