@@ -287,6 +287,8 @@ public class MotisMapper {
                 Boolean value = Boolean.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 setMotisValidationObject(motisValidationObject, value, true);
 
+            } else {
+                // More case.
             }
 
         }
