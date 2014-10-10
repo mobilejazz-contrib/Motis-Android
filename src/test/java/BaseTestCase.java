@@ -17,6 +17,8 @@ public class BaseTestCase extends TestCase {
     private static final String KEY_DOUBLE = "double";
     private static final String KEY_STRING = "string";
     private static final String KEY_DATE = "date";
+    private static final String KEY_FLOAT_CLASS = "Float";
+    private static final String KEY_INTEGER_CLASS = "Integer";
 
     @Override
     protected void setUp() throws Exception {
@@ -100,6 +102,28 @@ public class BaseTestCase extends TestCase {
         assertThat(motisObject.getIntField())
                 .isNotNull()
                 .isEqualTo(1);
+    }
+
+    public void testStringToFloat () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        // Check with primitive type
+        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT, "1.0f ");
+
+        assertThat(motisObject.getFloatField())
+                .isNotNull()
+                .isEqualTo(1.0f);
+
+        // Check with Float class
+        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT_CLASS, "1.0f ");
+
+        assertThat(motisObject.getFloatClassField())
+                .isNotNull()
+                .isEqualTo(1.0f);
+
+
     }
 
    public void testFloatToFloat() throws Exception {

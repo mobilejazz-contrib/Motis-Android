@@ -238,15 +238,28 @@ public class MotisMapper {
             String valueString = (String) motisValidationObject.getObject();
             if (outClass.equals(int.class)) {
 
-                valueString.trim();
-
-                int value = (int) Integer.valueOf(valueString);
+                int value = (int) Integer.valueOf(valueString.trim());
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
+
             } else if (outClass.equals(Integer.class)) {
+
                 Integer value = Integer.valueOf((String) motisValidationObject.getObject());
                 motisValidationObject.setObject(value);
                 motisValidationObject.setValid(true);
+
+            } else if (outClass.equals(float.class)) {
+
+                float value = (float) Float.valueOf(valueString.trim());
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+
+            } else if (outClass.equals(Float.class)) {
+
+                Float value = Float.valueOf(valueString.trim());
+                motisValidationObject.setObject(value);
+                motisValidationObject.setValid(true);
+
             }
 
         }

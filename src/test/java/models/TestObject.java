@@ -19,6 +19,9 @@ public class TestObject {
     @MotisKey("string") private String stringField;
     @MotisKey("date") private Date dateField;
 
+    @MotisKey("Float") private Float floatClassField;
+    @MotisKey("Integer") private Integer integerClassField;
+
     public int getIntField() {
         return intField;
     }
@@ -65,5 +68,21 @@ public class TestObject {
 
     public void setDateField(Date dateField) {
         this.dateField = dateField;
+    }
+
+    public Float getFloatClassField() {
+        return floatClassField;
+    }
+
+    public void setFloatClassField(Float floatClassField) {
+        this.floatClassField = floatClassField;
+    }
+
+    public Integer getIntegerClassField() {
+        return integerClassField;
+    }
+
+    public void setIntegerClassField(Integer integerClassField) {
+        this.integerClassField = integerClassField;
     }
 }
