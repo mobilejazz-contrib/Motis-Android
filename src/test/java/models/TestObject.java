@@ -24,6 +24,7 @@ public class TestObject {
     @MotisKey("Integer") private Integer integerClassField;
     @MotisKey("Double") private Double doubleClassField;
     @MotisKey("Long") private Long longClassField;
+    @MotisKey("Boolean") private Boolean booleanClassField;
 
     public int getIntField() {
         return intField;
@@ -49,7 +50,7 @@ public class TestObject {
         this.doubleField = doubleField;
     }
 
-    public boolean isBooleanField() {
+    public boolean getBooleanField() {
         return booleanField;
     }
 
@@ -111,5 +112,13 @@ public class TestObject {
 
     public void setLongClassField(Long longClassField) {
         this.longClassField = longClassField;
+    }
+
+    public Boolean getBooleanClassField() {
+        return booleanClassField;
+    }
+
+    public void setBooleanClassField(Boolean booleanClassField) {
+        this.booleanClassField = booleanClassField;
     }
 }

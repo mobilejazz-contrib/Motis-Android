@@ -22,6 +22,7 @@ public class BaseTestCase extends TestCase {
     private static final String KEY_INTEGER_CLASS = "Integer";
     private static final String KEY_DOUBLE_CLASS = "Double";
     private static final String KEY_LONG_CLASS = "Long";
+    private static final String KEY_BOOLEAN_CLASS = "Boolean";
 
     @Override
     protected void setUp() throws Exception {
@@ -62,7 +63,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
         motisMapper.mapObjectForKey(motisObject, KEY_BOOL, true);
 
-        assertThat(motisObject.isBooleanField()).isTrue();
+        assertThat(motisObject.getBooleanField()).isTrue();
 
     }
 
@@ -73,7 +74,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
         motisMapper.mapObjectForKey(motisObject, KEY_BOOL, false);
 
-        assertThat(motisObject.isBooleanField()).isFalse();
+        assertThat(motisObject.getBooleanField()).isFalse();
     }
 
     public void testIntToInt () throws Exception {
@@ -185,6 +186,27 @@ public class BaseTestCase extends TestCase {
         assertThat(motisObject.getLongClassField())
                 .isNotNull()
                 .isEqualTo(Long.MAX_VALUE);
+
+    }
+
+    public void testStringToBool () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        // Check with primitive types
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, "false");
+
+        assertThat(motisObject.getBooleanField())
+                .isNotNull()
+                .isEqualTo(false);
+
+        // Check with Boolean class
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, "t r u e");
+
+        assertThat(motisObject.getBooleanClassField())
+                .isNotNull()
+                .isEqualTo(true);
 
     }
 
