@@ -305,6 +305,11 @@ public class MotisMapper {
                 Boolean value = valueInt > 0;
                 setMotisValidationObject(motisValidationObject, value, true);
 
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueInt);
+                setMotisValidationObject(motisValidationObject, value, true);
+
             }
 
         } else if (inClass.equals(Float.class)) {
@@ -320,7 +325,13 @@ public class MotisMapper {
                 Boolean value = valueFloat > 0.0f;
                 setMotisValidationObject(motisValidationObject, value, true);
 
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueFloat);
+                setMotisValidationObject(motisValidationObject, value, true);
+
             }
+
         } else if (inClass.equals(Double.class)) {
             double valueDouble = (Double) motisValidationObject.getObject();
 
@@ -332,6 +343,11 @@ public class MotisMapper {
             } else if (outClass.equals(Boolean.class)) {
 
                 Boolean value = valueDouble > 0.0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueDouble);
                 setMotisValidationObject(motisValidationObject, value, true);
 
             }

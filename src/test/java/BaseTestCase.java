@@ -268,6 +268,48 @@ public class BaseTestCase extends TestCase {
 
     }
 
+    public void testIntegerToString () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        Integer valueInt = 1;
+        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueInt);
+
+        assertThat(motisObject.getStringField())
+                .isNotNull()
+                .isEqualTo("1");
+
+    }
+
+    public void testFloatToString () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        float valueFloat = 1.0f;
+        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueFloat);
+
+        assertThat(motisObject.getStringField())
+                .isNotNull()
+                .isEqualTo("1.0");
+
+    }
+
+    public void testDoubleToString () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        double valueDouble = 1.0;
+        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueDouble);
+
+        assertThat(motisObject.getStringField())
+                .isNotNull()
+                .isEqualTo("1.0");
+
+    }
+
 /*    public void testNullToObject () throws Exception {
         TestObject motisObject = new TestObject();
 
