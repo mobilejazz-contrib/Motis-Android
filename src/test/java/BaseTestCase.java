@@ -248,6 +248,26 @@ public class BaseTestCase extends TestCase {
                 .isEqualTo(true);
     }
 
+    public void testDoubleToBool () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        double valueDouble = 0.0;
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, valueDouble);
+
+        assertThat(motisObject.getBooleanField())
+                .isNotNull()
+                .isEqualTo(false);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, valueDouble);
+
+        assertThat(motisObject.getBooleanClassField())
+                .isNotNull()
+                .isEqualTo(false);
+
+    }
+
 /*    public void testNullToObject () throws Exception {
         TestObject motisObject = new TestObject();
 

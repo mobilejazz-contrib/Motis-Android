@@ -321,6 +321,21 @@ public class MotisMapper {
                 setMotisValidationObject(motisValidationObject, value, true);
 
             }
+        } else if (inClass.equals(Double.class)) {
+            double valueDouble = (Double) motisValidationObject.getObject();
+
+            if (outClass.equals(boolean.class)) {
+
+                boolean value = valueDouble > 0.0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Boolean.class)) {
+
+                Boolean value = valueDouble > 0.0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            }
+
         }
 
         /**
