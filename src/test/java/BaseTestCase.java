@@ -221,6 +221,31 @@ public class BaseTestCase extends TestCase {
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
                 .isEqualTo(false);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, i);
+
+        assertThat(motisObject.getBooleanClassField())
+                .isNotNull()
+                .isEqualTo(false);
+    }
+
+    public void testFloatToBool () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        float i = 1.0f;
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, i);
+
+        assertThat(motisObject.getBooleanField())
+                .isNotNull()
+                .isEqualTo(true);
+
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, i);
+
+        assertThat(motisObject.getBooleanClassField())
+                .isNotNull()
+                .isEqualTo(true);
     }
 
 /*    public void testNullToObject () throws Exception {
