@@ -195,7 +195,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         // Check with primitive types
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, "false");
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, "FALSE");
 
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
@@ -210,9 +210,28 @@ public class BaseTestCase extends TestCase {
 
     }
 
-    public void testNumberToString() throws Exception {
-//        TestObject motisObject = new TestObject();
-//        motisObject.setStringField(1);
+    public void testIntegerToBool () throws Exception {
+        TestObject motisObject = new TestObject();
 
+        MotisMapper motisMapper  = new MotisMapper(motisObject.getClass());
+
+        int i = 0;
+        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, i);
+
+        assertThat(motisObject.getBooleanField())
+                .isNotNull()
+                .isEqualTo(false);
     }
+
+/*    public void testNullToObject () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        motisMapper.mapObjectForKey(motisObject, KEY_INT, null);
+
+        assertThat(motisObject.getIntField())
+                .isNull();
+    }*/
+
 }

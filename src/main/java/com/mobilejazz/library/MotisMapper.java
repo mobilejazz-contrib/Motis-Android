@@ -291,6 +291,17 @@ public class MotisMapper {
                 // More case.
             }
 
+        } else if (inClass.equals(Integer.class)) {
+            int valueInt = (Integer) motisValidationObject.getObject();
+
+            if (outClass.equals(boolean.class)) {
+
+                boolean value = valueInt > 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+
+            }
+
         }
 
         /**
