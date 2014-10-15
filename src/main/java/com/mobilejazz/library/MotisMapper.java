@@ -6,15 +6,14 @@ import com.mobilejazz.library.annotations.MotisArray;
 import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class MotisMapper {
 
@@ -24,6 +23,8 @@ public class MotisMapper {
     private HashMap <String, String> mapping;
     private HashMap <String, Class> arrayClassMapping;
 
+    private SimpleDateFormat dateFormat;
+
     public MotisMapper(Class clazz) {
         super();
 
@@ -32,10 +33,14 @@ public class MotisMapper {
             this.clazz = clazz;
 
             Annotation annotation = clazz.getAnnotation(MotisClass.class);
-            this.motisSetup = (MotisClass)annotation;
+            this.motisSetup = (MotisClass) annotation;
 
             mapping = new HashMap<String, String>();
             arrayClassMapping = new HashMap<String, Class>();
+
+            if (!motisSetup.dateFormat().equals("")) {
+                dateFormat = new SimpleDateFormat(motisSetup.dateFormat());
+            }
 
             Field [] fields = clazz.getDeclaredFields();
 
@@ -43,7 +48,7 @@ public class MotisMapper {
                 String fieldName = field.getName();
 
                 if (field.isAnnotationPresent(MotisKey.class)) {
-                    MotisKey motisKey = (MotisKey)field.getAnnotation(MotisKey.class);
+                    MotisKey motisKey = (MotisKey) field.getAnnotation(MotisKey.class);
 
                     String jsonName = motisKey.value();
                     mapping.put(jsonName, fieldName);
@@ -53,13 +58,12 @@ public class MotisMapper {
                 }
 
                 if (field.isAnnotationPresent(MotisArray.class)) {
-                    MotisArray motisArray = (MotisArray)field.getAnnotation(MotisArray.class);
+                    MotisArray motisArray = (MotisArray) field.getAnnotation(MotisArray.class);
                     arrayClassMapping.put(fieldName, motisArray.value());
                 }
             }
         }
-        else
-        {
+        else {
             this.clazz = null;
             this.mapping = null;
             this.motisSetup = null;
@@ -287,8 +291,75 @@ public class MotisMapper {
                 Boolean value = Boolean.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
                 setMotisValidationObject(motisValidationObject, value, true);
 
+            } else if (outClass.equals(Date.class)) {
+
+                if (MotisValidationTypes.isNumeric(valueString)) {
+
+                    long longDate = Long.parseLong(valueString);
+                    Date value = new Date(longDate * 1000L);
+
+                    setMotisValidationObject(motisValidationObject, value, true);
+
+                } else {
+
+                    try {
+
+                        if (dateFormat != null) {
+
+                            Date value = dateFormat.parse(valueString);
+                            setMotisValidationObject(motisValidationObject, value, true);
+
+                        } else {
+                            // Nothing
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+
+                        // Handle error;
+
+                    }
+
+                }
+
+/*                // More cases.
+                if (dateFormat != null) {
+
+//                    try {
+
+                        Calendar cal = Calendar.getInstance();
+                        TimeZone tz = cal.getTimeZone();
+                        Date localTime = new Date(System.currentTimeMillis());
+
+                        Locale locale = java.util.Locale.getDefault();
+//                        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, locale);
+                        dateFormat.setTimeZone(tz);
+
+                        if (valueString != null && !valueString.isEmpty()) {
+                            Date date = null;
+                            try {
+                                Date d = dateFormat.parse(valueString);
+                                date = new Date(d.getTime() + TimeZone.getDefault().getOffset(localTime.getTime()));
+//                                return date;
+                                setMotisValidationObject(motisValidationObject, date, true);
+                            } catch (java.text.ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+
+//                        Date value = dateFormat.parse(valueString);
+
+//                        setMotisValidationObject(motisValidationObject, value, true);
+*//*
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }*//*
+
+                }*/
+
             } else {
-                // More case.
+
             }
 
         } else if (inClass.equals(Integer.class)) {

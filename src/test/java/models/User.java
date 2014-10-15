@@ -9,7 +9,7 @@ import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
 
-@MotisClass
+@MotisClass(dateFormat = "yyyy-MM-dd")
 public class User {
 
     @MotisKey("server_id")

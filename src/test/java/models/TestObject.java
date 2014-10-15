@@ -8,7 +8,8 @@ import java.util.Date;
 /**
  * Created by Jose Luis on 09/10/14.
  */
-@MotisClass
+//@MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss.S")
+@MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss")
 public class TestObject {
 
     @MotisKey("int") private int intField;

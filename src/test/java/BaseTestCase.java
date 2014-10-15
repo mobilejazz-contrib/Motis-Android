@@ -210,6 +210,42 @@ public class BaseTestCase extends TestCase {
 
     }
 
+    public void testStringUnixTimeToDate () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        String oldDate = "1306249409";
+        motisMapper.mapObjectForKey(motisObject, KEY_DATE, oldDate);
+
+        assertThat(motisObject.getDateField())
+                .isNotNull();
+
+        System.out.println("//-------------------------------------------------------//");
+        System.out.println("The old date is: " + oldDate);
+        System.out.println("The new date is: " + motisObject.getDateField().toString());
+        System.out.println("//-------------------------------------------------------//");
+
+    }
+
+    public void testStringToDate () throws Exception {
+        TestObject motisObject = new TestObject();
+
+        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+
+        String dateString = "2014-09-02 09:18:08";
+        motisMapper.mapObjectForKey(motisObject, KEY_DATE, dateString);
+
+        assertThat(motisObject.getDateField())
+                .isNotNull();
+
+        System.out.println("//-------------------------------------------------------//");
+        System.out.println("The old date is: " + dateString);
+        System.out.println("The new date is: " + motisObject.getDateField().toString());
+        System.out.println("//-------------------------------------------------------//");
+
+    }
+
     public void testIntegerToBool () throws Exception {
         TestObject motisObject = new TestObject();
 
