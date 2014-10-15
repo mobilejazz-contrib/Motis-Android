@@ -25,6 +25,13 @@ public class MotisMapper {
 
     private SimpleDateFormat dateFormat;
 
+    private Method onCreationMethod;
+    private Method onDidCreateMethod;
+    private Method ignoredSetterMethod;
+    private Method invalidValueMethod;
+
+    private HashMap <String, Method> validationMethods;
+
     public MotisMapper(Class clazz) {
         super();
 
@@ -61,6 +68,7 @@ public class MotisMapper {
                     MotisArray motisArray = (MotisArray) field.getAnnotation(MotisArray.class);
                     arrayClassMapping.put(fieldName, motisArray.value());
                 }
+
             }
         }
         else {
@@ -75,8 +83,6 @@ public class MotisMapper {
         // If motis setup doesn't exist, we cannot proceed.
         if (this.motisSetup == null)
            return false;
-
-
 
         Iterator <String> keys = jsonObject.keys();
 
@@ -319,47 +325,8 @@ public class MotisMapper {
                         // Handle error;
 
                     }
-
                 }
-
-/*                // More cases.
-                if (dateFormat != null) {
-
-//                    try {
-
-                        Calendar cal = Calendar.getInstance();
-                        TimeZone tz = cal.getTimeZone();
-                        Date localTime = new Date(System.currentTimeMillis());
-
-                        Locale locale = java.util.Locale.getDefault();
-//                        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT, locale);
-                        dateFormat.setTimeZone(tz);
-
-                        if (valueString != null && !valueString.isEmpty()) {
-                            Date date = null;
-                            try {
-                                Date d = dateFormat.parse(valueString);
-                                date = new Date(d.getTime() + TimeZone.getDefault().getOffset(localTime.getTime()));
-//                                return date;
-                                setMotisValidationObject(motisValidationObject, date, true);
-                            } catch (java.text.ParseException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-
-//                        Date value = dateFormat.parse(valueString);
-
-//                        setMotisValidationObject(motisValidationObject, value, true);
-*//*
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }*//*
-
-                }*/
-
             } else {
-
             }
 
         } else if (inClass.equals(Integer.class)) {
@@ -379,6 +346,12 @@ public class MotisMapper {
             } else if (outClass.equals(String.class)) {
 
                 String value = String.valueOf(valueInt);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueInt;
+                Date value = new Date(longDate * 1000L);
                 setMotisValidationObject(motisValidationObject, value, true);
 
             }
@@ -401,6 +374,12 @@ public class MotisMapper {
                 String value = String.valueOf(valueFloat);
                 setMotisValidationObject(motisValidationObject, value, true);
 
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueFloat;
+                Date value = new Date(longDate * 1000L);
+                setMotisValidationObject(motisValidationObject, value, true);
+
             }
 
         } else if (inClass.equals(Double.class)) {
@@ -419,6 +398,12 @@ public class MotisMapper {
             } else if (outClass.equals(String.class)) {
 
                 String value = String.valueOf(valueDouble);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueDouble;
+                Date value = new Date(longDate * 1000L);
                 setMotisValidationObject(motisValidationObject, value, true);
 
             }

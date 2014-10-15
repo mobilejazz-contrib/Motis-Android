@@ -122,4 +122,5 @@ public class TestObject {
     public void setBooleanClassField(Boolean booleanClassField) {
         this.booleanClassField = booleanClassField;
     }
+
 }

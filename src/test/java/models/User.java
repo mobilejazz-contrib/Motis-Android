@@ -55,8 +55,7 @@ public class User {
         return super.toString() + " id " + id + " name " + name + " date " + date + " friend {" + friend + "} enemies " + enemies;
     }
 
-    @MotisMethod
-    protected void validateDate(MotisValidation validation) {
+    protected void foo(MotisValidation validation) {
 
         Object object = validation.getObject();
 
