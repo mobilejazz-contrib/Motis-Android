@@ -31,6 +31,8 @@ public class TestObject {
     @MotisKey("Long") private Long longClassField;
     @MotisKey("Boolean") private Boolean booleanClassField;
 
+    private int ignoredSetter;
+
     public int getIntField() {
         return intField;
     }
@@ -128,19 +130,27 @@ public class TestObject {
     }
 
 
-    @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation (){
+    @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation () {
+
+        System.out.println("Call to motisOnCreation with this data;");
 
     }
 
-    @MotisMethod(MotisMethodTypes.ON_DID_CREATE) public void motisOnDidCreate () {
+    @MotisMethod(MotisMethodTypes.ON_DID_CREATE) public void motisOnDidCreate (String name, Object object) {
+
+        System.out.println("Call to MotisOnDidCreate with this data; Name -> " + name + " and Object -> " + object.toString());
 
     }
 
-    @MotisMethod (MotisMethodTypes.IGNORED_SETTER) public void motisIgnoredSetter () {
+    @MotisMethod (MotisMethodTypes.IGNORED_SETTER) public void motisIgnoredSetter (String jsonValue, String jsonKey) {
+
+        System.out.println("Call to MotisIgnoredSetter with this data; JsonValue -> " + jsonValue + " and jsonKey -> " + jsonKey);
 
     }
 
     @MotisMethod (MotisMethodTypes.INVALID_VALUE) public void motisInvalidValue () {
+
+        System.out.println("Call to motisInvalidValue with this data;");
 
     }
 

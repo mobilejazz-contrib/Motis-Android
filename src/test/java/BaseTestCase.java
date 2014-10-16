@@ -35,7 +35,7 @@ public class BaseTestCase extends TestCase {
      *
      */
 
-/*    public void testMotis() {
+    public void testMotis() {
         System.out.println("MOTIS TEST");
 
         String rawJson = "{\"server_id\":42,\"user_name\":\"John Doe\",\"creation_date\":1405428749, \"best_friend\":{\"server_id\":24,\"user_name\":\"Lara Croft\",\"creation_date\":1405228739}, \"worse_enemies\":[{\"server_id\":2,\"user_name\":\"Batman The Dark\",\"creation_date\":1305228739},{\"server_id\":6,\"user_name\":\"Javier Chavarri\",\"creation_date\":1405156839},{\"server_id\":9,\"user_name\":\"Austin Peligro Powers\",\"creation_date\":925299900}]}";
@@ -54,7 +54,7 @@ public class BaseTestCase extends TestCase {
         } catch (Exception e) {
             System.out.println("Catch exception: " + e.toString());
         }
-    }*/
+    }
 
     public void testTrueBoolToBool () throws Exception{
         TestObject motisObject = new TestObject();
@@ -77,7 +77,7 @@ public class BaseTestCase extends TestCase {
         assertThat(motisObject.getBooleanField()).isFalse();
     }
 
-    public void     testIntToInt () throws Exception {
+    public void testIntToInt () throws Exception {
         TestObject motisObject = new TestObject();
         motisObject.setIntField(1);
 

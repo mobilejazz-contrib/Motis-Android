@@ -160,6 +160,14 @@ public class TestObjectValidationMethods {
     @MotisValidationMethod("float")
     public void validationFloat (MotisValidation motisValidation) {
         printValidationType("float");
+
+        float value = (Float) motisValidation.getObject();
+
+        value = 12.0f;
+
+        motisValidation.setObject(value);
+        motisValidation.setValid(true);
+
     }
 
     @MotisValidationMethod("Float")
@@ -183,22 +191,6 @@ public class TestObjectValidationMethods {
     }
 
     // Method for informations
-
-    @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation (){
-
-    }
-
-    @MotisMethod(MotisMethodTypes.ON_DID_CREATE) public void motisOnDidCreate () {
-
-    }
-
-    @MotisMethod (MotisMethodTypes.IGNORED_SETTER) public void motisIgnoredSetter () {
-
-    }
-
-    @MotisMethod (MotisMethodTypes.INVALID_VALUE) public void motisInvalidValue () {
-
-    }
 
     private void printValidationType (String type) {
         System.out.println("Validating key " + type);

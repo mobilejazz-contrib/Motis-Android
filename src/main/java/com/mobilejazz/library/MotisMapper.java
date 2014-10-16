@@ -27,10 +27,10 @@ public class MotisMapper {
 
     private SimpleDateFormat dateFormat;
 
-    private Method onCreationMethod;
-    private Method onDidCreateMethod;
-    private Method ignoredSetterMethod;
-    private Method invalidValueMethod;
+    private Method methodOnCreationMethod;
+    private Method methodOnDidCreateMethod;
+    private Method methodIgnoredSetterMethod;
+    private Method methodInvalidValueMethod;
 
     private HashMap <String, Method> validationMethods;
 
@@ -75,19 +75,43 @@ public class MotisMapper {
 
             Method [] methods = clazz.getDeclaredMethods();
 
+            if (validationMethods == null) {
+                validationMethods = new HashMap<String, Method>();
+            }
+
             for (Method method : methods) {
 
                 if (method.isAnnotationPresent(MotisValidationMethod.class)) {
 
-                    if (validationMethods == null) {
-                        validationMethods = new HashMap<String, Method>();
-                    }
-
                     MotisValidationMethod motisValidationMethod = (MotisValidationMethod) method.getAnnotation(MotisValidationMethod.class);
                     validationMethods.put(motisValidationMethod.value(), method);
 
-                }
+                } else if (method.isAnnotationPresent(MotisMethod.class)) {
 
+                    MotisMethod motisValidationMethod = method.getAnnotation(MotisMethod.class);
+
+                    int typeOfMethod = motisValidationMethod.value();
+
+                    switch (typeOfMethod) {
+
+                        case MotisMethodTypes.ON_CREATION:
+                            methodOnCreationMethod = method;
+                            break;
+
+                        case MotisMethodTypes.INVALID_VALUE:
+                            methodInvalidValueMethod = method;
+                            break;
+
+                        case MotisMethodTypes.IGNORED_SETTER:
+                            methodIgnoredSetterMethod = method;
+                            break;
+
+                        case MotisMethodTypes.ON_DID_CREATE:
+                            methodOnDidCreateMethod = method;
+                            break;
+
+                    }
+                }
             }
         }
         else {
@@ -130,9 +154,18 @@ public class MotisMapper {
              * Invoked ignoredSetterMethod and check if exist;
              * Return orginal key and jsonvalue
              */
-//            if (ignoredSetterMethod) {
-//
-//            }
+            if (methodIgnoredSetterMethod != null) {
+                try {
+
+                    methodIgnoredSetterMethod.setAccessible(true);
+                    methodIgnoredSetterMethod.invoke(jsonKey, jsonValue);
+
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+            }
 
             return;
         }
@@ -184,7 +217,6 @@ public class MotisMapper {
 
                 field.setAccessible(true); // Why setter the accessible to true when is false;
 
-
                 try {
                     field.set(object, finalValue);
                 } catch (IllegalAccessException e) {
@@ -200,7 +232,18 @@ public class MotisMapper {
                  * Invoke the invalidValueMethod and check if exist
                  * Return params jsonvalue and key
                  */
+                if (methodInvalidValueMethod != null) {
+                    try {
 
+                        methodInvalidValueMethod.setAccessible(true);
+                        methodInvalidValueMethod.invoke(jsonKey, jsonValue);
+
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
+                }
 
 
                 System.out.println("No es valido");
@@ -454,8 +497,21 @@ public class MotisMapper {
                 int value = (valueBoolean) ? 1 : 0;
                 setMotisValidationObject(motisValidationObject, value, true);
 
-            } else {
-                // follow the test!!
+            } else if (outClass.equals(Integer.class)) {
+
+                Integer value = valueBoolean ? 1 : 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(float.class)) {
+
+                float value = valueBoolean ? 1.0f : 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Float.class)) {
+
+                Float value = valueBoolean ? 1.0f : 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
             }
 
         }
@@ -513,7 +569,7 @@ public class MotisMapper {
         boolean valid = true;
         Object newInstance = null; // <-- The new instance to be assigned
 
-        Method creator = onCreationMethod;
+        Method creator = methodOnCreationMethod;
 
         if (creator != null) {
             try {
@@ -548,13 +604,40 @@ public class MotisMapper {
         }
 
 
-        if (!valid)
-        {
+        if (!valid) {
             // call method InvalidValue (name, jsonDict), similar to InvalidValueMethod
+            if (methodInvalidValueMethod != null) {
+
+                try {
+
+                    methodInvalidValueMethod.setAccessible(true);
+                    methodInvalidValueMethod.invoke(name, jsonObject);
+
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
         }
-        else
-        {
+        else {
             // call method onDidCreateMethod (attributeName, object)
+
+            if (methodOnDidCreateMethod != null) {
+
+                try {
+                    methodOnDidCreateMethod.setAccessible(true);
+                    methodOnDidCreateMethod.invoke(name, object);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
         }
 
 

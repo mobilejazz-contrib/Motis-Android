@@ -31,11 +31,23 @@ public class BaseTestManualValidations extends TestCase {
         TestObjectValidationMethods testObject = new TestObjectValidationMethods();
 
         MotisMapper mapper = new MotisMapper(testObject.getClass());
-        mapper.mapObjectForKey(testObject, KEY_INT, true);
+        mapper.mapObjectForKey(testObject, KEY_INT, 1);
 
         assertThat(testObject.getIntField())
                 .isNotNull()
                 .isEqualTo(12);
+
+    }
+
+    public void testValidationMethodFloat() throws Exception {
+        TestObjectValidationMethods testObject = new TestObjectValidationMethods();
+
+        MotisMapper mapper = new MotisMapper(testObject.getClass());
+        mapper.mapObjectForKey(testObject, KEY_FLOAT, 1.0f);
+
+        assertThat(testObject.getFloatField())
+                .isNotNull()
+                .isEqualTo(12.0f);
 
     }
 }
