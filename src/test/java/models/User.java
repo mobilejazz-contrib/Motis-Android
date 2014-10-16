@@ -3,6 +3,7 @@ package models;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.mobilejazz.library.MotisCreation;
 import com.mobilejazz.library.MotisValidation;
 import com.mobilejazz.library.annotations.MotisArray;
 import com.mobilejazz.library.annotations.MotisClass;
@@ -74,21 +75,18 @@ public class User {
         }
      }
 
-    /*
     @MotisMethod
     protected void onCreationMotisObject(String name, MotisCreation motisCreation) {
         System.out.println("Object Creation : " + name);
         // This method gives the chance to manually create the object that Motis will automatically assign.
         // Obviously, this method is only used when creating objects from JSONObject instances.
-    }*/
+    }
 
 
-    /*
     @MotisMethod
     protected void onCreationMotisArrayObject(String name, MotisCreation motisCreation) {
         System.out.println("Object Creation : " + name);
         // This method gives the chance to manually create the object that Motis will automatically assign.
         // Obviously, this method is only used when creating objects from JSONObject instances.
     }
-    */
 }

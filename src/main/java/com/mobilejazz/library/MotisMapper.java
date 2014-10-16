@@ -6,6 +6,8 @@ import com.mobilejazz.library.annotations.MotisArray;
 import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
+import com.mobilejazz.library.annotations.MotisValidationMethod;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.lang.reflect.Field;
@@ -70,6 +72,23 @@ public class MotisMapper {
                 }
 
             }
+
+            Method [] methods = clazz.getDeclaredMethods();
+
+            for (Method method : methods) {
+
+                if (method.isAnnotationPresent(MotisValidationMethod.class)) {
+
+                    if (validationMethods == null) {
+                        validationMethods = new HashMap<String, Method>();
+                    }
+
+                    MotisValidationMethod motisValidationMethod = (MotisValidationMethod) method.getAnnotation(MotisValidationMethod.class);
+                    validationMethods.put(motisValidationMethod.value(), method);
+
+                }
+
+            }
         }
         else {
             this.clazz = null;
@@ -106,6 +125,15 @@ public class MotisMapper {
 
         if (objectKey == null) {
             // If no object key to map, do nothing.
+
+            /**
+             * Invoked ignoredSetterMethod and check if exist;
+             * Return orginal key and jsonvalue
+             */
+//            if (ignoredSetterMethod) {
+//
+//            }
+
             return;
         }
 
@@ -117,7 +145,8 @@ public class MotisMapper {
             boolean validated = true;
 
             // ----- MANUAL VALIDATION ----- //
-            Method validator = this.getMotisMethod("validate", objectKey, MotisValidation.class);
+//            Method validator = this.getMotisMethod("validate", objectKey, MotisValidation.class);
+            Method validator = validationMethods.get(jsonKey);
 
             if (validator != null) {
                 // Validate the value if available
@@ -166,6 +195,14 @@ public class MotisMapper {
                 field.setAccessible(accessible);
             } else {
                 // TODO: value not validated!
+
+                /**
+                 * Invoke the invalidValueMethod and check if exist
+                 * Return params jsonvalue and key
+                 */
+
+
+
                 System.out.println("No es valido");
             }
         } catch (NoSuchFieldException e) {
@@ -217,7 +254,7 @@ public class MotisMapper {
                             JSONObject jsonItem = jsonArray.optJSONObject(i);
 
                             MotisValidation motisValidation = new MotisValidation(jsonItem);
-                            this.createInstance(object, "onCreationMotisArrayObject", motisValidation, arrayItemClass);
+                            this.createInstance(object, name, motisValidation, arrayItemClass);
 
                             if (motisValidation.isValid()) {
                                 Object newObject = motisValidation.getObject();
@@ -408,6 +445,19 @@ public class MotisMapper {
 
             }
 
+        } else if (inClass.equals(Boolean.class)) {
+
+            Boolean valueBoolean = (Boolean) motisValidationObject.getObject();
+
+            if (outClass.equals(int.class)) {
+
+                int value = (valueBoolean) ? 1 : 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else {
+                // follow the test!!
+            }
+
         }
 
         /**
@@ -419,6 +469,14 @@ public class MotisMapper {
         }
     }
 
+
+    /**
+     *
+     * @param keyword
+     * @param name
+     * @param paramClass
+     * @return
+     */
     private Method getMotisMethod(String keyword, String name, Class<?> ... paramClass) {
         String uppercaseName = "";
 
@@ -439,14 +497,24 @@ public class MotisMapper {
         return null;
     }
 
-    private void createInstance(Object object, String creationMethodName, MotisValidation motisValidation, Class outClass) {
+    /**
+     *
+     * @param name
+     * @param paramClass
+     */
+    private void getAllMotisValidationMethod (String name, Class<?> ... paramClass) {
+
+    }
+
+    private void createInstance(Object object, String name, MotisValidation motisValidation, Class outClass) {
 
         JSONObject jsonObject = (JSONObject) motisValidation.getObject();
 
         boolean valid = true;
         Object newInstance = null; // <-- The new instance to be assigned
 
-        Method creator = this.getMotisMethod(creationMethodName, null, String.class, MotisCreation.class);
+        Method creator = onCreationMethod;
+
         if (creator != null) {
             try {
 
@@ -465,7 +533,7 @@ public class MotisMapper {
             }
         }
 
-        if (newInstance == null && valid == true) {
+        if (newInstance == null && valid) {
             // if new instance still not defined and not invalidated yet, lets create it!
             try {
                 newInstance = outClass.newInstance();
@@ -473,18 +541,34 @@ public class MotisMapper {
                 // Here the magic of the Motis recursion!
                 MotisMapper mapper = new MotisMapper(outClass);
                 mapper.map(newInstance, jsonObject);
-
             } catch (Exception e) {
                 // If cannot create new instance, invalidate
                 valid = false;
             }
         }
 
+
+        if (!valid)
+        {
+            // call method InvalidValue (name, jsonDict), similar to InvalidValueMethod
+        }
+        else
+        {
+            // call method onDidCreateMethod (attributeName, object)
+        }
+
+
         // Finally, lets set the new instance and the validation state
         motisValidation.setObject(newInstance);
         motisValidation.setValid(valid);
     }
 
+    /**
+     *
+     * @param motisValidation
+     * @param value
+     * @param isValid
+     */
     private void setMotisValidationObject (MotisValidation motisValidation, Object value, boolean isValid) {
         motisValidation.setObject(value);
         motisValidation.setValid(isValid);

@@ -12,9 +12,8 @@ import java.util.Date;
 /**
  * Created by Jose Luis on 09/10/14.
  */
-//@MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss.S")
 @MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss")
-public class TestObject {
+public class TestObjectValidationMethods {
 
     @MotisKey("int") private int intField;
     @MotisKey("float") private float floatField;
@@ -128,6 +127,63 @@ public class TestObject {
     }
 
 
+
+    @MotisValidationMethod("int")
+    public void validateFloat (MotisValidation motisValidation) {
+        int value = (Integer) motisValidation.getObject();
+
+        printValidationType("int - with this value entry + " + value);
+
+        int valueFinal = 12;
+
+        motisValidation.setObject(valueFinal);
+        motisValidation.setValid(true);
+
+
+    }
+
+    @MotisValidationMethod("double")
+    public void validateDouble (MotisValidation motisValidation) {
+        System.out.println("Validating key Int");
+    }
+
+    @MotisValidationMethod("string")
+    public void validateString (MotisValidation motisValidation) {
+        printValidationType("string");
+    }
+
+    @MotisValidationMethod("date")
+    public void validationDate (MotisValidation motisValidation) {
+        printValidationType("date");
+    }
+
+    @MotisValidationMethod("float")
+    public void validationFloat (MotisValidation motisValidation) {
+        printValidationType("float");
+    }
+
+    @MotisValidationMethod("Float")
+    public void validationInteger (MotisValidation motisValidation) {
+        printValidationType("Float");
+    }
+
+    @MotisValidationMethod("Double")
+    public void validationDouble (MotisValidation motisValidation) {
+        printValidationType("Double");
+    }
+
+    @MotisValidationMethod("Long")
+    public void validationLong (MotisValidation motisValidation) {
+        printValidationType("Long");
+    }
+
+    @MotisValidationMethod("Boolean")
+    public void validationBoolean (MotisValidation motisValidation) {
+        printValidationType("Boolean");
+    }
+
+    // Method for informations
+
     @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation (){
 
     }
@@ -144,5 +200,8 @@ public class TestObject {
 
     }
 
+    private void printValidationType (String type) {
+        System.out.println("Validating key " + type);
+    }
 
 }
