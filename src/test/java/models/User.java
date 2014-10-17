@@ -3,13 +3,15 @@ package models;
 import java.util.ArrayList;
 import java.util.Date;
 
+import com.mobilejazz.library.MotisCreation;
+import com.mobilejazz.library.MotisMethodTypes;
 import com.mobilejazz.library.MotisValidation;
 import com.mobilejazz.library.annotations.MotisArray;
 import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
 
-@MotisClass
+@MotisClass(dateFormat = "yyyy-MM-dd")
 public class User {
 
     @MotisKey("server_id")
@@ -55,41 +57,27 @@ public class User {
         return super.toString() + " id " + id + " name " + name + " date " + date + " friend {" + friend + "} enemies " + enemies;
     }
 
-    @MotisMethod
-    protected void validateDate(MotisValidation validation) {
+    @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation () {
 
-        Object object = validation.getObject();
+        System.out.println("Call to motisOnCreation with this data;");
 
-        if (object.getClass().equals(Integer.class))
-        {
-            Integer value = (Integer)object;
-            validation.setObject(new Date(value.intValue()*1000));// <-- convert seconds to milliseconds
-        }
-        else if (object.getClass().equals(Date.class))
-        {
-            // Nothing to do
-        }
-        else
-        {
-            validation.setValid(false);
-        }
-     }
-
-    /*
-    @MotisMethod
-    protected void onCreationMotisObject(String name, MotisCreation motisCreation) {
-        System.out.println("Object Creation : " + name);
-        // This method gives the chance to manually create the object that Motis will automatically assign.
-        // Obviously, this method is only used when creating objects from JSONObject instances.
-    }*/
-
-
-    /*
-    @MotisMethod
-    protected void onCreationMotisArrayObject(String name, MotisCreation motisCreation) {
-        System.out.println("Object Creation : " + name);
-        // This method gives the chance to manually create the object that Motis will automatically assign.
-        // Obviously, this method is only used when creating objects from JSONObject instances.
     }
-    */
+
+    @MotisMethod(MotisMethodTypes.ON_DID_CREATE) public void motisOnDidCreate (String name, Object object) {
+
+        System.out.println("Call to MotisOnDidCreate with this data; Name -> " + name + " and Object -> " + object.toString());
+
+    }
+
+    @MotisMethod (MotisMethodTypes.IGNORED_SETTER) public void motisIgnoredSetter (String jsonValue, String jsonKey) {
+
+        System.out.println("Call to MotisIgnoredSetter with this data; JsonValue -> " + jsonValue + " and jsonKey -> " + jsonKey);
+
+    }
+
+    @MotisMethod (MotisMethodTypes.INVALID_VALUE) public void motisInvalidValue () {
+
+        System.out.println("Call to motisInvalidValue with this data;");
+
+    }
 }

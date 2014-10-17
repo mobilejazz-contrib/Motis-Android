@@ -6,35 +6,62 @@ import com.mobilejazz.library.annotations.MotisArray;
 import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
+import com.mobilejazz.library.annotations.MotisValidationMethod;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class MotisMapper {
 
     private Class clazz;
     private MotisClass motisSetup;
-
     private HashMap <String, String> mapping;
     private HashMap <String, Class> arrayClassMapping;
+    private SimpleDateFormat dateFormat;
 
-    public MotisMapper(Class clazz) {
+    private HashMap <String, Method> validationMethods;
+
+
+    private static HashMap<Class, MotisMapper> collectionMotisMappers;
+
+    public static MotisMapper getInstance(Class clazz) {
+
+        if (collectionMotisMappers == null) {
+            collectionMotisMappers = new HashMap<Class, MotisMapper>();
+        }
+
+        MotisMapper mapper = collectionMotisMappers.get(clazz);
+
+        if (mapper == null) {
+            mapper = new MotisMapper(clazz);
+            collectionMotisMappers.put(clazz, mapper);
+        }
+
+        return mapper;
+
+    }
+    
+    private MotisMapper(Class clazz) {
         super();
-
-        if (clazz.isAnnotationPresent(MotisClass.class)) {
+        
+        if (clazz.isAnnotationPresent(MotisClass.class))  {
 
             this.clazz = clazz;
 
             Annotation annotation = clazz.getAnnotation(MotisClass.class);
-            this.motisSetup = (MotisClass)annotation;
+            this.motisSetup = (MotisClass) annotation;
 
             mapping = new HashMap<String, String>();
             arrayClassMapping = new HashMap<String, Class>();
+
+            if (!motisSetup.dateFormat().equals("")) {
+                dateFormat = new SimpleDateFormat(motisSetup.dateFormat());
+            }
 
             Field [] fields = clazz.getDeclaredFields();
 
@@ -42,7 +69,7 @@ public class MotisMapper {
                 String fieldName = field.getName();
 
                 if (field.isAnnotationPresent(MotisKey.class)) {
-                    MotisKey motisKey = (MotisKey)field.getAnnotation(MotisKey.class);
+                    MotisKey motisKey = (MotisKey) field.getAnnotation(MotisKey.class);
 
                     String jsonName = motisKey.value();
                     mapping.put(jsonName, fieldName);
@@ -52,13 +79,29 @@ public class MotisMapper {
                 }
 
                 if (field.isAnnotationPresent(MotisArray.class)) {
-                    MotisArray motisArray = (MotisArray)field.getAnnotation(MotisArray.class);
+                    MotisArray motisArray = (MotisArray) field.getAnnotation(MotisArray.class);
                     arrayClassMapping.put(fieldName, motisArray.value());
+                }
+
+            }
+
+            Method [] methods = clazz.getDeclaredMethods();
+
+            if (validationMethods == null) {
+                validationMethods = new HashMap<String, Method>();
+            }
+
+            for (Method method : methods) {
+
+                if (method.isAnnotationPresent(MotisValidationMethod.class)) {
+
+                    MotisValidationMethod motisValidationMethod = (MotisValidationMethod) method.getAnnotation(MotisValidationMethod.class);
+                    validationMethods.put(motisValidationMethod.value(), method);
+
                 }
             }
         }
-        else
-        {
+        else {
             this.clazz = null;
             this.mapping = null;
             this.motisSetup = null;
@@ -71,8 +114,6 @@ public class MotisMapper {
         if (this.motisSetup == null)
            return false;
 
-
-
         Iterator <String> keys = jsonObject.keys();
 
         while (keys.hasNext()) {
@@ -81,32 +122,51 @@ public class MotisMapper {
             Object jsonValue = jsonObject.opt(jsonKey);
             // TODO: what about null values?
 
-            this.mapObjectForKey(object, jsonKey, jsonValue);
+            this.mapObjectValueForFieldName(object, jsonKey, jsonValue);
         }
 
         return true;
     }
 
-    private void mapObjectForKey(Object object, String jsonKey, Object jsonValue)  {
+    public void mapObjectValueForFieldName(Object object, String jsonKey, Object jsonValue)  {
+
+        MotisInterface interfaceMotis = null;
+
+        if (object instanceof MotisInterface) {
+            interfaceMotis = (MotisInterface) object;
+        }
+
+
+
 
         Class objectClass = object.getClass();
 
-        String objectKey = this.mapJsonKey(jsonKey);
+        String fieldName = this.mapJsonKey(jsonKey);
 
-        if (objectKey == null) {
+
+        if (fieldName == null) {
             // If no object key to map, do nothing.
+
+            /**
+             * Invoked ignoredSetterMethod and check if exist;
+             * Return orginal key and jsonvalue
+             */
+            if (interfaceMotis != null)
+                interfaceMotis.motisIgnoredSetter(jsonKey, jsonValue);
+
             return;
         }
 
         try {
             // Get the field
-            Field field = objectClass.getDeclaredField(objectKey);
+            Field field = objectClass.getDeclaredField(fieldName);
 
             Object finalValue = jsonValue;
             boolean validated = true;
 
             // ----- MANUAL VALIDATION ----- //
-            Method validator = this.getMotisMethod("validate", objectKey, MotisValidation.class);
+//            Method validator = this.getMotisMethod("validate", objectKey, MotisValidation.class);
+            Method validator = validationMethods.get(jsonKey);
 
             if (validator != null) {
                 // Validate the value if available
@@ -132,7 +192,7 @@ public class MotisMapper {
                 // If still valid and the object didn't change, lets do automatic validation
                 MotisValidation motisValidationObject = new MotisValidation(finalValue);
 
-                this.automaticValidation(object, objectKey, field, motisValidationObject);
+                this.automaticValidation(object, fieldName, field, motisValidationObject);
 
                 validated = motisValidationObject.isValid();
                 finalValue = motisValidationObject.getObject();
@@ -141,16 +201,29 @@ public class MotisMapper {
             if (validated) {
                 // If validated, set the new value
                 boolean accessible = field.isAccessible();
-                field.setAccessible(true);
+
+                field.setAccessible(true); // Why setter the accessible to true when is false;
+
                 try {
                     field.set(object, finalValue);
                 } catch (IllegalAccessException e) {
                     // TODO: could not set value!
+                    System.out.println("IllegalArgumentException: " + e.getMessage());
                 }
 
                 field.setAccessible(accessible);
             } else {
                 // TODO: value not validated!
+
+                /**
+                 * Invoke the invalidValueMethod and check if exist
+                 * Return params jsonvalue and key
+                 */
+
+                if (interfaceMotis != null)
+                    interfaceMotis.motisInvalidValue(jsonKey, jsonValue);
+
+                System.out.println("No es valido");
             }
         } catch (NoSuchFieldException e) {
             // TODO : handle exception
@@ -201,7 +274,7 @@ public class MotisMapper {
                             JSONObject jsonItem = jsonArray.optJSONObject(i);
 
                             MotisValidation motisValidation = new MotisValidation(jsonItem);
-                            this.createInstance(object, "onCreationMotisArrayObject", motisValidation, arrayItemClass);
+                            this.createInstance(object, name, motisValidation, arrayItemClass);
 
                             if (motisValidation.isValid()) {
                                 Object newObject = motisValidation.getObject();
@@ -228,15 +301,216 @@ public class MotisMapper {
                 motisValidationObject.setValid(false);
             }
 
-        } else if (false) {
+        } else if (inClass.equals(String.class)) {
             // TODO: Do other cases as Dates, URLS, etc.
-        } else {
+            String valueString = (String) motisValidationObject.getObject();
+            if (outClass.equals(int.class)) {
+
+                int value = (int) Integer.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Integer.class)) {
+
+                Integer value = Integer.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(float.class)) {
+
+                float value = (float) Float.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Float.class)) {
+
+                Float value = Float.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(double.class)) {
+
+                double value = (double) Double.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Double.class)) {
+
+                Double value = Double.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(long.class)) {
+
+                long value = (long) Long.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Long.class)) {
+
+                Long value = Long.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(boolean.class)) {
+
+                boolean value = (boolean) Boolean.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Boolean.class)) {
+
+                Boolean value = Boolean.valueOf(MotisValidationTypes.removedAllSpaces(valueString));
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                if (MotisValidationTypes.isNumeric(valueString)) {
+
+                    long longDate = Long.parseLong(valueString);
+                    Date value = new Date(longDate * 1000L);
+
+                    setMotisValidationObject(motisValidationObject, value, true);
+
+                } else {
+
+                    try {
+
+                        if (dateFormat != null) {
+
+                            Date value = dateFormat.parse(valueString);
+                            setMotisValidationObject(motisValidationObject, value, true);
+
+                        } else {
+                            // Nothing
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+
+                        // Handle error;
+
+                    }
+                }
+            } else {
+            }
+
+        } else if (inClass.equals(Integer.class)) {
+            int valueInt = (Integer) motisValidationObject.getObject();
+
+            if (outClass.equals(boolean.class)) {
+
+                boolean value = valueInt > 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+
+            } else if (outClass.equals(Boolean.class)) {
+
+                Boolean value = valueInt > 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueInt);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueInt;
+                Date value = new Date(longDate * 1000L);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            }
+
+        } else if (inClass.equals(Float.class)) {
+            float valueFloat = (Float) motisValidationObject.getObject();
+
+            if (outClass.equals(boolean.class)) {
+
+                boolean value = valueFloat > 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Boolean.class)) {
+
+                Boolean value = valueFloat > 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueFloat);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueFloat;
+                Date value = new Date(longDate * 1000L);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            }
+
+        } else if (inClass.equals(Double.class)) {
+            double valueDouble = (Double) motisValidationObject.getObject();
+
+            if (outClass.equals(boolean.class)) {
+
+                boolean value = valueDouble > 0.0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Boolean.class)) {
+
+                Boolean value = valueDouble > 0.0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(String.class)) {
+
+                String value = String.valueOf(valueDouble);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Date.class)) {
+
+                long longDate = (long) valueDouble;
+                Date value = new Date(longDate * 1000L);
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            }
+
+        } else if (inClass.equals(Boolean.class)) {
+
+            Boolean valueBoolean = (Boolean) motisValidationObject.getObject();
+
+            if (outClass.equals(int.class)) {
+
+                int value = (valueBoolean) ? 1 : 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Integer.class)) {
+
+                Integer value = valueBoolean ? 1 : 0;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(float.class)) {
+
+                float value = valueBoolean ? 1.0f : 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            } else if (outClass.equals(Float.class)) {
+
+                Float value = valueBoolean ? 1.0f : 0.0f;
+                setMotisValidationObject(motisValidationObject, value, true);
+
+            }
+
+        }
+
+        /**
+         * json types: dictionary, array, string, number, true/false, null
+         */
+
+        else {
             // Otherwise the values are not compatible. However, we keep the valid status and we let the IllegalArgumentException to be raised.
         }
     }
 
-    private Method getMotisMethod(String keyword, String name, Class<?> ... paramClass)
-    {
+
+    /**
+     *
+     * @param keyword
+     * @param name
+     * @param paramClass
+     * @return
+     */
+    private Method getMotisMethod(String keyword, String name, Class<?> ... paramClass) {
         String uppercaseName = "";
 
         if (name != null && name.length() > 0)
@@ -256,34 +530,35 @@ public class MotisMapper {
         return null;
     }
 
+    /**
+     *
+     * @param name
+     * @param paramClass
+     */
+    private void getAllMotisValidationMethod (String name, Class<?> ... paramClass) {
 
-    private void createInstance(Object object, String creationMethodName, MotisValidation motisValidation, Class outClass) {
+    }
+
+    private void createInstance(Object object, String name, MotisValidation motisValidation, Class outClass) {
 
         JSONObject jsonObject = (JSONObject) motisValidation.getObject();
 
         boolean valid = true;
         Object newInstance = null; // <-- The new instance to be assigned
 
-        Method creator = this.getMotisMethod(creationMethodName, null, String.class, MotisCreation.class);
-        if (creator != null) {
-            try {
+        MotisInterface interfaceMotis = null;
+        if (object instanceof MotisInterface) {
+            interfaceMotis = (MotisInterface) object;
+            MotisCreation motisCreation = new MotisCreation(jsonObject);
 
-                MotisCreation motisCreation = new MotisCreation(jsonObject);
+            interfaceMotis.motisOnCreation(name, motisCreation);
 
-                boolean accessible = creator.isAccessible();
-                creator.setAccessible(true);
-                creator.invoke(object, motisCreation);
-                creator.setAccessible(accessible);
+            valid = motisCreation.isValid();
+            newInstance = motisCreation.getNewObject();
 
-                valid = motisCreation.isValid();
-                newInstance = motisCreation.getNewObject();
-            } catch (Exception e) {
-                // If cannot create new instance, invalidate
-                valid = false;
-            }
         }
 
-        if (newInstance == null && valid == true) {
+        if (newInstance == null && valid) {
             // if new instance still not defined and not invalidated yet, lets create it!
             try {
                 newInstance = outClass.newInstance();
@@ -291,15 +566,39 @@ public class MotisMapper {
                 // Here the magic of the Motis recursion!
                 MotisMapper mapper = new MotisMapper(outClass);
                 mapper.map(newInstance, jsonObject);
-
             } catch (Exception e) {
                 // If cannot create new instance, invalidate
                 valid = false;
             }
         }
 
+
+        if (!valid) {
+            // call method InvalidValue (name, jsonDict), similar to InvalidValueMethod
+            if (interfaceMotis != null)
+                interfaceMotis.motisInvalidValue(name, jsonObject);
+        }
+        else {
+            // call method onDidCreateMethod (attributeName, object)
+            if (interfaceMotis != null)
+                interfaceMotis.motisOnDidCreate(name, jsonObject);
+        }
+
+
         // Finally, lets set the new instance and the validation state
         motisValidation.setObject(newInstance);
         motisValidation.setValid(valid);
     }
+
+    /**
+     *
+     * @param motisValidation
+     * @param value
+     * @param isValid
+     */
+    private void setMotisValidationObject (MotisValidation motisValidation, Object value, boolean isValid) {
+        motisValidation.setObject(value);
+        motisValidation.setValid(isValid);
+    }
+
 }

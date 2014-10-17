@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface MotisClass {
     boolean shouldSetUndefinedKeys() default false;
+    String dateFormat() default "";
 }
