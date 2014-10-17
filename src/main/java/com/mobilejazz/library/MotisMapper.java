@@ -20,18 +20,36 @@ public class MotisMapper {
 
     private Class clazz;
     private MotisClass motisSetup;
-
     private HashMap <String, String> mapping;
     private HashMap <String, Class> arrayClassMapping;
-
     private SimpleDateFormat dateFormat;
 
     private HashMap <String, Method> validationMethods;
 
-    public MotisMapper(Class clazz) {
-        super();
 
-        if (clazz.isAnnotationPresent(MotisClass.class)) {
+    private static HashMap<Class, MotisMapper> collectionMotisMappers;
+
+    public static MotisMapper getInstance(Class clazz) {
+
+        if (collectionMotisMappers == null) {
+            collectionMotisMappers = new HashMap<Class, MotisMapper>();
+        }
+
+        MotisMapper mapper = collectionMotisMappers.get(clazz);
+
+        if (mapper == null) {
+            mapper = new MotisMapper(clazz);
+            collectionMotisMappers.put(clazz, mapper);
+        }
+
+        return mapper;
+
+    }
+    
+    private MotisMapper(Class clazz) {
+        super();
+        
+        if (clazz.isAnnotationPresent(MotisClass.class))  {
 
             this.clazz = clazz;
 
