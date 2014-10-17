@@ -1,8 +1,6 @@
 import com.mobilejazz.library.MotisMapper;
 import models.TestObject;
-import models.User;
 import junit.framework.TestCase;
-import org.json.JSONObject;
 
 import static org.fest.assertions.Assertions.assertThat;
 
@@ -35,7 +33,7 @@ public class BaseTestCase extends TestCase {
      *
      */
 
-    public void testMotis() {
+/*    public void testMotis() {
         System.out.println("MOTIS TEST");
 
         String rawJson = "{\"server_id\":42,\"user_name\":\"John Doe\",\"creation_date\":1405428749, \"best_friend\":{\"server_id\":24,\"user_name\":\"Lara Croft\",\"creation_date\":1405228739}, \"worse_enemies\":[{\"server_id\":2,\"user_name\":\"Batman The Dark\",\"creation_date\":1305228739},{\"server_id\":6,\"user_name\":\"Javier Chavarri\",\"creation_date\":1405156839},{\"server_id\":9,\"user_name\":\"Austin Peligro Powers\",\"creation_date\":925299900}]}";
@@ -54,13 +52,14 @@ public class BaseTestCase extends TestCase {
         } catch (Exception e) {
             System.out.println("Catch exception: " + e.toString());
         }
-    }
+    }*/
 
     public void testTrueBoolToBool () throws Exception{
         TestObject motisObject = new TestObject();
         motisObject.setBooleanField(false);
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+//        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, true);
 
         assertThat(motisObject.getBooleanField()).isTrue();
@@ -71,7 +70,7 @@ public class BaseTestCase extends TestCase {
         TestObject motisObject = new TestObject();
         motisObject.setBooleanField(true);
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, false);
 
         assertThat(motisObject.getBooleanField()).isFalse();
@@ -81,7 +80,7 @@ public class BaseTestCase extends TestCase {
         TestObject motisObject = new TestObject();
         motisObject.setIntField(1);
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, 0);
 
         assertThat(motisObject.getIntField())
@@ -101,7 +100,7 @@ public class BaseTestCase extends TestCase {
         TestObject motisObject = new TestObject();
         motisObject.setFloatField(0.0f);
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_FLOAT, 1.0f);
 
         assertThat(motisObject.getFloatField())
@@ -113,7 +112,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToInt () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, "1 ");
 
         assertThat(motisObject.getIntField())
@@ -131,7 +130,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToFloat () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         // Check with primitive type
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_FLOAT, "1.0f ");
@@ -152,7 +151,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToDouble () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         // Check with primitive type
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_DOUBLE, "-1.0 ");
@@ -172,7 +171,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToLong () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         // Check with primitive type
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_LONG, "-9223372036854775808");
@@ -192,7 +191,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToBool () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         // Check with primitive types
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, "FALSE");
@@ -213,7 +212,7 @@ public class BaseTestCase extends TestCase {
     public void testStringUnixTimeToDate () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         String oldDate = "1306249409";
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_DATE, oldDate);
@@ -231,7 +230,7 @@ public class BaseTestCase extends TestCase {
     public void testStringToDate () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         String dateString = "2014-09-02 09:18:08";
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_DATE, dateString);
@@ -249,7 +248,7 @@ public class BaseTestCase extends TestCase {
     public void testIntegerToBool () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper  = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper  = MotisMapper.getInstance(motisObject.getClass());
 
         int i = 0;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, i);
@@ -268,7 +267,7 @@ public class BaseTestCase extends TestCase {
     public void testFloatToBool () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         float i = 1.0f;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, i);
@@ -287,7 +286,7 @@ public class BaseTestCase extends TestCase {
     public void testDoubleToBool () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         double valueDouble = 0.0;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, valueDouble);
@@ -307,7 +306,7 @@ public class BaseTestCase extends TestCase {
     public void testIntegerToString () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         Integer valueInt = 1;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueInt);
@@ -321,7 +320,7 @@ public class BaseTestCase extends TestCase {
     public void testFloatToString () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         float valueFloat = 1.0f;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueFloat);
@@ -335,7 +334,7 @@ public class BaseTestCase extends TestCase {
     public void testDoubleToString () throws Exception {
         TestObject motisObject = new TestObject();
 
-        MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
+        MotisMapper motisMapper = MotisMapper.getInstance(motisObject.getClass());
 
         double valueDouble = 1.0;
         motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueDouble);

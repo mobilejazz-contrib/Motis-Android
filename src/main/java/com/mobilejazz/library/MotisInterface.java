@@ -1,7 +1,5 @@
 package com.mobilejazz.library;
 
-import com.mobilejazz.library.annotations.MotisMethod;
-
 /**
  * Created by Jose Luis on 17/10/14.
  */

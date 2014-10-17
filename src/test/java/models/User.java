@@ -57,42 +57,6 @@ public class User {
         return super.toString() + " id " + id + " name " + name + " date " + date + " friend {" + friend + "} enemies " + enemies;
     }
 
-    protected void foo(MotisValidation validation) {
-
-        Object object = validation.getObject();
-
-        if (object.getClass().equals(Integer.class))
-        {
-            Integer value = (Integer)object;
-            validation.setObject(new Date(value.intValue()*1000));// <-- convert seconds to milliseconds
-        }
-        else if (object.getClass().equals(Date.class))
-        {
-            // Nothing to do
-        }
-        else
-        {
-            validation.setValid(false);
-        }
-     }
-
-/*
-    @MotisMethod
-    protected void onCreationMotisObject(String name, MotisCreation motisCreation) {
-        System.out.println("Object Creation : " + name);
-        // This method gives the chance to manually create the object that Motis will automatically assign.
-        // Obviously, this method is only used when creating objects from JSONObject instances.
-    }
-
-
-    @MotisMethod
-    protected void onCreationMotisArrayObject(String name, MotisCreation motisCreation) {
-        System.out.println("Object Creation : " + name);
-        // This method gives the chance to manually create the object that Motis will automatically assign.
-        // Obviously, this method is only used when creating objects from JSONObject instances.
-    }
-*/
-
     @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation () {
 
         System.out.println("Call to motisOnCreation with this data;");

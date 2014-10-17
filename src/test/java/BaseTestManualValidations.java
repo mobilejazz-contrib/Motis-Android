@@ -30,7 +30,7 @@ public class BaseTestManualValidations extends TestCase {
     public void testValidationMethodInt() throws Exception {
         TestObjectValidationMethods testObject = new TestObjectValidationMethods();
 
-        MotisMapper mapper = new MotisMapper(testObject.getClass());
+        MotisMapper mapper = MotisMapper.getInstance(testObject.getClass());
         mapper.mapObjectValueForFieldName(testObject, KEY_INT, 1);
 
         assertThat(testObject.getIntField())
@@ -42,7 +42,7 @@ public class BaseTestManualValidations extends TestCase {
     public void testValidationMethodFloat() throws Exception {
         TestObjectValidationMethods testObject = new TestObjectValidationMethods();
 
-        MotisMapper mapper = new MotisMapper(testObject.getClass());
+        MotisMapper mapper = MotisMapper.getInstance(testObject.getClass());
         mapper.mapObjectValueForFieldName(testObject, KEY_FLOAT, 1.0f);
 
         assertThat(testObject.getFloatField())
