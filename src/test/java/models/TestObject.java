@@ -1,11 +1,9 @@
 package models;
 
-import com.mobilejazz.library.MotisMethodTypes;
-import com.mobilejazz.library.MotisValidation;
+import com.mobilejazz.library.MotisCreation;
+import com.mobilejazz.library.MotisInterface;
 import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
-import com.mobilejazz.library.annotations.MotisMethod;
-import com.mobilejazz.library.annotations.MotisValidationMethod;
 
 import java.util.Date;
 
@@ -14,7 +12,7 @@ import java.util.Date;
  */
 //@MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss.S")
 @MotisClass (dateFormat = "yyyy-MM-dd HH:mm:ss")
-public class TestObject {
+public class TestObject implements MotisInterface{
 
     @MotisKey("int") private int intField;
     @MotisKey("float") private float floatField;
@@ -129,30 +127,24 @@ public class TestObject {
         this.booleanClassField = booleanClassField;
     }
 
-
-    @MotisMethod(MotisMethodTypes.ON_CREATION) public void motisOnCreation () {
-
-        System.out.println("Call to motisOnCreation with this data;");
+    @Override public void motisOnCreation (String fieldName, MotisCreation motisCreation) {
+        System.out.println("Will create object for field name <" + fieldName + ">");
 
     }
 
-    @MotisMethod(MotisMethodTypes.ON_DID_CREATE) public void motisOnDidCreate (String name, Object object) {
-
-        System.out.println("Call to MotisOnDidCreate with this data; Name -> " + name + " and Object -> " + object.toString());
-
-    }
-
-    @MotisMethod (MotisMethodTypes.IGNORED_SETTER) public void motisIgnoredSetter (String jsonValue, String jsonKey) {
-
-        System.out.println("Call to MotisIgnoredSetter with this data; JsonValue -> " + jsonValue + " and jsonKey -> " + jsonKey);
+    @Override public void motisOnDidCreate(String fieldName, Object newObject) {
+        System.out.println("Did create object for field name <" + fieldName + ">, object : " + newObject.toString());
 
     }
 
-    @MotisMethod (MotisMethodTypes.INVALID_VALUE) public void motisInvalidValue () {
-
-        System.out.println("Call to motisInvalidValue with this data;");
+    @Override public void motisIgnoredSetter(String jsonKey, Object jsonValue) {
+        System.out.println("Ignored jsonKey <" + jsonKey + "> with jsonValue -> " + jsonValue);
 
     }
 
+    @Override public void motisInvalidValue(String fieldName, Object jsonValue) {
+        System.out.println("Invalid value for field name <" + fieldName + ">, value : " + jsonValue.toString());
+
+    }
 
 }

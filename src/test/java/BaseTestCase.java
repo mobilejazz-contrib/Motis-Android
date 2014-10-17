@@ -61,7 +61,7 @@ public class BaseTestCase extends TestCase {
         motisObject.setBooleanField(false);
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, true);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, true);
 
         assertThat(motisObject.getBooleanField()).isTrue();
 
@@ -72,7 +72,7 @@ public class BaseTestCase extends TestCase {
         motisObject.setBooleanField(true);
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, false);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, false);
 
         assertThat(motisObject.getBooleanField()).isFalse();
     }
@@ -82,13 +82,13 @@ public class BaseTestCase extends TestCase {
         motisObject.setIntField(1);
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_INT, 0);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, 0);
 
         assertThat(motisObject.getIntField())
                 .isGreaterThanOrEqualTo(0)
                 .isNotNull();
 
-        motisMapper.mapObjectForKey(motisObject, KEY_INT, -1);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, -1);
 
         assertThat(motisObject.getIntField())
                 .isLessThanOrEqualTo(-1)
@@ -102,7 +102,7 @@ public class BaseTestCase extends TestCase {
         motisObject.setFloatField(0.0f);
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT, 1.0f);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_FLOAT, 1.0f);
 
         assertThat(motisObject.getFloatField())
                 .isNotNull()
@@ -114,13 +114,13 @@ public class BaseTestCase extends TestCase {
         TestObject motisObject = new TestObject();
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
-        motisMapper.mapObjectForKey(motisObject, KEY_INT, "1 ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, "1 ");
 
         assertThat(motisObject.getIntField())
                 .isNotNull()
                 .isEqualTo(1);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_INTEGER_CLASS, "12323232 ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_INTEGER_CLASS, "12323232 ");
 
         assertThat(motisObject.getIntegerClassField())
                 .isNotNull()
@@ -134,14 +134,14 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         // Check with primitive type
-        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT, "1.0f ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_FLOAT, "1.0f ");
 
         assertThat(motisObject.getFloatField())
                 .isNotNull()
                 .isEqualTo(1.0f);
 
         // Check with Float class
-        motisMapper.mapObjectForKey(motisObject, KEY_FLOAT_CLASS, "1.0f ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_FLOAT_CLASS, "1.0f ");
 
         assertThat(motisObject.getFloatClassField())
                 .isNotNull()
@@ -155,13 +155,13 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         // Check with primitive type
-        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE, "-1.0 ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_DOUBLE, "-1.0 ");
 
         assertThat(motisObject.getDoubleField())
                 .isNotNull()
                 .isEqualTo(-1.0);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_DOUBLE_CLASS, "-1. 0 ");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_DOUBLE_CLASS, "-1. 0 ");
 
         assertThat(motisObject.getDoubleClassField())
                 .isNotNull()
@@ -175,13 +175,13 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         // Check with primitive type
-        motisMapper.mapObjectForKey(motisObject, KEY_LONG, "-9223372036854775808");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_LONG, "-9223372036854775808");
 
         assertThat(motisObject.getLongField())
                 .isNotNull()
                 .isEqualTo(Long.MIN_VALUE);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_LONG_CLASS, "92233720 36854775807");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_LONG_CLASS, "92233720 36854775807");
 
         assertThat(motisObject.getLongClassField())
                 .isNotNull()
@@ -195,14 +195,14 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         // Check with primitive types
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, "FALSE");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, "FALSE");
 
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
                 .isEqualTo(false);
 
         // Check with Boolean class
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, "t r u e");
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOLEAN_CLASS, "t r u e");
 
         assertThat(motisObject.getBooleanClassField())
                 .isNotNull()
@@ -216,7 +216,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         String oldDate = "1306249409";
-        motisMapper.mapObjectForKey(motisObject, KEY_DATE, oldDate);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_DATE, oldDate);
 
         assertThat(motisObject.getDateField())
                 .isNotNull();
@@ -234,7 +234,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         String dateString = "2014-09-02 09:18:08";
-        motisMapper.mapObjectForKey(motisObject, KEY_DATE, dateString);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_DATE, dateString);
 
         assertThat(motisObject.getDateField())
                 .isNotNull();
@@ -252,13 +252,13 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper  = new MotisMapper(motisObject.getClass());
 
         int i = 0;
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, i);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, i);
 
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
                 .isEqualTo(false);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, i);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOLEAN_CLASS, i);
 
         assertThat(motisObject.getBooleanClassField())
                 .isNotNull()
@@ -271,13 +271,13 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         float i = 1.0f;
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, i);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, i);
 
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
                 .isEqualTo(true);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, i);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOLEAN_CLASS, i);
 
         assertThat(motisObject.getBooleanClassField())
                 .isNotNull()
@@ -290,13 +290,13 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         double valueDouble = 0.0;
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOL, valueDouble);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOL, valueDouble);
 
         assertThat(motisObject.getBooleanField())
                 .isNotNull()
                 .isEqualTo(false);
 
-        motisMapper.mapObjectForKey(motisObject, KEY_BOOLEAN_CLASS, valueDouble);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_BOOLEAN_CLASS, valueDouble);
 
         assertThat(motisObject.getBooleanClassField())
                 .isNotNull()
@@ -310,7 +310,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         Integer valueInt = 1;
-        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueInt);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueInt);
 
         assertThat(motisObject.getStringField())
                 .isNotNull()
@@ -324,7 +324,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         float valueFloat = 1.0f;
-        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueFloat);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueFloat);
 
         assertThat(motisObject.getStringField())
                 .isNotNull()
@@ -338,7 +338,7 @@ public class BaseTestCase extends TestCase {
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
         double valueDouble = 1.0;
-        motisMapper.mapObjectForKey(motisObject, KEY_STRING, valueDouble);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_STRING, valueDouble);
 
         assertThat(motisObject.getStringField())
                 .isNotNull()
@@ -351,7 +351,7 @@ public class BaseTestCase extends TestCase {
 
         MotisMapper motisMapper = new MotisMapper(motisObject.getClass());
 
-        motisMapper.mapObjectForKey(motisObject, KEY_INT, null);
+        motisMapper.mapObjectValueForFieldName(motisObject, KEY_INT, null);
 
         assertThat(motisObject.getIntField())
                 .isNull();

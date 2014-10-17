@@ -128,8 +128,10 @@ public class TestObjectValidationMethods {
 
 
 
-    @MotisValidationMethod("int")
-    public void validateFloat (MotisValidation motisValidation) {
+
+
+    @MotisValidationMethod("intField")
+    public void validateMyIntField(MotisValidation motisValidation) {
         int value = (Integer) motisValidation.getObject();
 
         printValidationType("int - with this value entry + " + value);
