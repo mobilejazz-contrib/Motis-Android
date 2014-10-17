@@ -7,7 +7,6 @@ import com.mobilejazz.library.annotations.MotisClass;
 import com.mobilejazz.library.annotations.MotisKey;
 import com.mobilejazz.library.annotations.MotisMethod;
 import com.mobilejazz.library.annotations.MotisValidationMethod;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.lang.reflect.Field;
@@ -26,11 +25,6 @@ public class MotisMapper {
     private HashMap <String, Class> arrayClassMapping;
 
     private SimpleDateFormat dateFormat;
-
-    private Method methodOnCreationMethod;
-    private Method methodOnDidCreateMethod;
-    private Method methodIgnoredSetterMethod;
-    private Method methodInvalidValueMethod;
 
     private HashMap <String, Method> validationMethods;
 
@@ -86,31 +80,6 @@ public class MotisMapper {
                     MotisValidationMethod motisValidationMethod = (MotisValidationMethod) method.getAnnotation(MotisValidationMethod.class);
                     validationMethods.put(motisValidationMethod.value(), method);
 
-                } else if (method.isAnnotationPresent(MotisMethod.class)) {
-
-                    MotisMethod motisValidationMethod = method.getAnnotation(MotisMethod.class);
-
-                    int typeOfMethod = motisValidationMethod.value();
-
-                    switch (typeOfMethod) {
-
-                        case MotisMethodTypes.ON_CREATION:
-                            methodOnCreationMethod = method;
-                            break;
-
-                        case MotisMethodTypes.INVALID_VALUE:
-                            methodInvalidValueMethod = method;
-                            break;
-
-                        case MotisMethodTypes.IGNORED_SETTER:
-                            methodIgnoredSetterMethod = method;
-                            break;
-
-                        case MotisMethodTypes.ON_DID_CREATE:
-                            methodOnDidCreateMethod = method;
-                            break;
-
-                    }
                 }
             }
         }
@@ -135,44 +104,44 @@ public class MotisMapper {
             Object jsonValue = jsonObject.opt(jsonKey);
             // TODO: what about null values?
 
-            this.mapObjectForKey(object, jsonKey, jsonValue);
+            this.mapObjectValueForFieldName(object, jsonKey, jsonValue);
         }
 
         return true;
     }
 
-    public void mapObjectForKey(Object object, String jsonKey, Object jsonValue)  {
+    public void mapObjectValueForFieldName(Object object, String jsonKey, Object jsonValue)  {
+
+        MotisInterface interfaceMotis = null;
+
+        if (object instanceof MotisInterface) {
+            interfaceMotis = (MotisInterface) object;
+        }
+
+
+
 
         Class objectClass = object.getClass();
 
-        String objectKey = this.mapJsonKey(jsonKey);
+        String fieldName = this.mapJsonKey(jsonKey);
 
-        if (objectKey == null) {
+
+        if (fieldName == null) {
             // If no object key to map, do nothing.
 
             /**
              * Invoked ignoredSetterMethod and check if exist;
              * Return orginal key and jsonvalue
              */
-            if (methodIgnoredSetterMethod != null) {
-                try {
-
-                    methodIgnoredSetterMethod.setAccessible(true);
-                    methodIgnoredSetterMethod.invoke(jsonKey, jsonValue);
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-            }
+            if (interfaceMotis != null)
+                interfaceMotis.motisIgnoredSetter(jsonKey, jsonValue);
 
             return;
         }
 
         try {
             // Get the field
-            Field field = objectClass.getDeclaredField(objectKey);
+            Field field = objectClass.getDeclaredField(fieldName);
 
             Object finalValue = jsonValue;
             boolean validated = true;
@@ -205,7 +174,7 @@ public class MotisMapper {
                 // If still valid and the object didn't change, lets do automatic validation
                 MotisValidation motisValidationObject = new MotisValidation(finalValue);
 
-                this.automaticValidation(object, objectKey, field, motisValidationObject);
+                this.automaticValidation(object, fieldName, field, motisValidationObject);
 
                 validated = motisValidationObject.isValid();
                 finalValue = motisValidationObject.getObject();
@@ -232,19 +201,9 @@ public class MotisMapper {
                  * Invoke the invalidValueMethod and check if exist
                  * Return params jsonvalue and key
                  */
-                if (methodInvalidValueMethod != null) {
-                    try {
 
-                        methodInvalidValueMethod.setAccessible(true);
-                        methodInvalidValueMethod.invoke(jsonKey, jsonValue);
-
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-
+                if (interfaceMotis != null)
+                    interfaceMotis.motisInvalidValue(jsonKey, jsonValue);
 
                 System.out.println("No es valido");
             }
@@ -569,24 +528,16 @@ public class MotisMapper {
         boolean valid = true;
         Object newInstance = null; // <-- The new instance to be assigned
 
-        Method creator = methodOnCreationMethod;
+        MotisInterface interfaceMotis = null;
+        if (object instanceof MotisInterface) {
+            interfaceMotis = (MotisInterface) object;
+            MotisCreation motisCreation = new MotisCreation(jsonObject);
 
-        if (creator != null) {
-            try {
+            interfaceMotis.motisOnCreation(name, motisCreation);
 
-                MotisCreation motisCreation = new MotisCreation(jsonObject);
+            valid = motisCreation.isValid();
+            newInstance = motisCreation.getNewObject();
 
-                boolean accessible = creator.isAccessible();
-                creator.setAccessible(true);
-                creator.invoke(object, motisCreation);
-                creator.setAccessible(accessible);
-
-                valid = motisCreation.isValid();
-                newInstance = motisCreation.getNewObject();
-            } catch (Exception e) {
-                // If cannot create new instance, invalidate
-                valid = false;
-            }
         }
 
         if (newInstance == null && valid) {
@@ -606,38 +557,13 @@ public class MotisMapper {
 
         if (!valid) {
             // call method InvalidValue (name, jsonDict), similar to InvalidValueMethod
-            if (methodInvalidValueMethod != null) {
-
-                try {
-
-                    methodInvalidValueMethod.setAccessible(true);
-                    methodInvalidValueMethod.invoke(name, jsonObject);
-
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
+            if (interfaceMotis != null)
+                interfaceMotis.motisInvalidValue(name, jsonObject);
         }
         else {
             // call method onDidCreateMethod (attributeName, object)
-
-            if (methodOnDidCreateMethod != null) {
-
-                try {
-                    methodOnDidCreateMethod.setAccessible(true);
-                    methodOnDidCreateMethod.invoke(name, object);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
-
-            }
-
+            if (interfaceMotis != null)
+                interfaceMotis.motisOnDidCreate(name, jsonObject);
         }
 
 
